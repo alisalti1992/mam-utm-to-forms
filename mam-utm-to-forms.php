@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Move Ahead Media UTM To Form
+ * Plugin Name: Move Ahead Media UTMs To Forms
  * Plugin URI: https://github.com/moveaheadmedia/mam-utm-to-forms/
  * Description: This plugin helps users to get utm data into contact forms hidden fields!
  * Version: 1.0
