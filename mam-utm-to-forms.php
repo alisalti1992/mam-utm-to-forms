@@ -10,6 +10,40 @@
  */
 
 
+// Storing URL parameters
+add_action( 'init', 'mam_utm_to_forms_init_parameters' );
+function mam_utm_to_forms_init_parameters() {
+	global $wp;
+	$mam_parameters = array();
+	$original       = array();
+	if ( isset( $_COOKIE['mam_utm_to_forms_parameters'] ) ) {
+		$original = json_decode( $_COOKIE['mam_utm_to_forms_parameters'], true );
+	}
+	if ( isset( $_GET['utm_source'] ) ) {
+		if ( ! isset( $original['utm_source'] ) || $original['utm_source'] == '' ) {
+			$mam_parameters['utm_source'] = $_GET['utm_source'];
+		}
+	}
+	if ( isset( $_GET['utm_medium'] ) ) {
+		if ( ! isset( $original['utm_medium'] ) || $original['utm_medium'] == '' ) {
+			$mam_parameters['utm_medium'] = $_GET['utm_medium'];
+		}
+	}
+	if ( isset( $_GET['utm_campaign'] ) ) {
+		if ( ! isset( $original['utm_campaign'] ) || $original['utm_campaign'] == '' ) {
+			$mam_parameters['utm_campaign'] = $_GET['utm_campaign'];
+		}
+	}
+	if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
+		if ( ! isset( $original['referral_url'] ) || $original['referral_url'] == '' ) {
+			$mam_parameters['referral_url'] = $_SERVER['HTTP_REFERER'];
+		}
+	}
+
+	setcookie( 'mam_utm_to_forms_parameters', json_encode( $mam_parameters ), time() + ( 3600 * 24 * 10 ), '/' );
+}
+
+
 // Create the admin options page
 add_action( 'plugins_loaded', 'mam_utm_to_forms_admin_options' );
 function mam_utm_to_forms_admin_options() {
@@ -18,8 +52,8 @@ function mam_utm_to_forms_admin_options() {
 	if ( function_exists( 'acf_add_options_page' ) ) {
 		// parent page
 		acf_add_options_page( array(
-			'page_title' => __('UTM To Forms'),
-			'menu_title' => __('UTM To Forms'),
+			'page_title' => __( 'UTM To Forms' ),
+			'menu_title' => __( 'UTM To Forms' ),
 			'menu_slug'  => 'mam-utm-to-forms',
 			'capability' => 'read',
 			'redirect'   => true
@@ -27,8 +61,8 @@ function mam_utm_to_forms_admin_options() {
 
 		// child page
 		acf_add_options_sub_page( array(
-			'page_title'  => __('UTM To Forms Options'),
-			'menu_title'  => __('UTM To Forms Options'),
+			'page_title'  => __( 'UTM To Forms Options' ),
+			'menu_title'  => __( 'UTM To Forms Options' ),
 			'menu_slug'   => 'mam-utm-to-forms-options',
 			'capability'  => 'read',
 			'parent_slug' => 'mam-utm-to-forms'
