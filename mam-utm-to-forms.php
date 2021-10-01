@@ -13,7 +13,6 @@
 // Storing URL parameters
 add_action( 'init', 'mam_utm_to_forms_init_parameters' );
 function mam_utm_to_forms_init_parameters() {
-	global $wp;
 	$mam_parameters = array();
 	$original       = array();
 	if ( isset( $_COOKIE['mam_utm_to_forms_parameters'] ) ) {
