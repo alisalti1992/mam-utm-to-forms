@@ -19,24 +19,35 @@ function mam_utm_to_forms_store_values() {
 	if ( isset( $_COOKIE['mam_utm_to_forms_parameters'] ) ) {
 		$original = json_decode( $_COOKIE['mam_utm_to_forms_parameters'], true );
 	}
-	if ( isset( $_GET['utm_source'] ) ) {
-		if ( ! isset( $original['utm_source'] ) || $original['utm_source'] == '' ) {
+	if ( isset( $_GET['utm_source'] ) && $_GET['utm_source'] != '' ) {
 			$original['utm_source'] = $_GET['utm_source'];
+	}else{
+		if ( ! isset( $original['utm_source'] ) || $original['utm_source'] == '' ) {
+			$original['utm_source'] = 'Direct';
 		}
 	}
-	if ( isset( $_GET['utm_medium'] ) ) {
-		if ( ! isset( $original['utm_medium'] ) || $original['utm_medium'] == '' ) {
+
+	if ( isset( $_GET['utm_medium'] ) && $_GET['utm_medium'] != '' ) {
 			$original['utm_medium'] = $_GET['utm_medium'];
+	}else{
+		if ( ! isset( $original['utm_medium'] ) || $original['utm_medium'] == '' ) {
+			$original['utm_medium'] = '';
 		}
 	}
-	if ( isset( $_GET['utm_campaign'] ) ) {
-		if ( ! isset( $original['utm_campaign'] ) || $original['utm_campaign'] == '' ) {
+
+	if ( isset( $_GET['utm_campaign'] ) && $_GET['utm_campaign'] != '' ) {
 			$original['utm_campaign'] = $_GET['utm_campaign'];
+	}else{
+		if ( ! isset( $original['utm_campaign'] ) || $original['utm_campaign'] == '' ) {
+			$original['utm_campaign'] = '';
 		}
 	}
+
 	if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
-		if ( ! isset( $original['referral_url'] ) || $original['referral_url'] == '' ) {
 			$original['referral_url'] = $_SERVER['HTTP_REFERER'];
+	}else{
+		if ( ! isset( $original['referral_url'] ) || $original['referral_url'] == '' ) {
+			$original['referral_url'] = '';
 		}
 	}
 
@@ -49,11 +60,11 @@ function mam_utm_to_forms_store_values() {
 	    }
     }
 
-	setcookie( 'mam_utm_to_forms_parameters', json_encode( $original ), time() + 36000);
+	setcookie( 'mam_utm_to_forms_parameters', json_encode( $original ), time() + 36000, '/');
 
 	mam_utm_to_forms_init_parameters();
 	global $mam_utm_to_forms_fields;
-	setcookie( 'mam_utm_to_forms_fields', json_encode( $mam_utm_to_forms_fields ), time() + 36000);
+	setcookie( 'mam_utm_to_forms_fields', json_encode( $mam_utm_to_forms_fields ), time() + 36000, '/');
 }
 
 function mam_utm_to_forms_init_parameters() {
