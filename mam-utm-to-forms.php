@@ -3,7 +3,7 @@
  * Plugin Name: Move Ahead Media UTM To Forms
  * Plugin URI: https://github.com/moveaheadmedia/mam-utm-to-forms/
  * Description: This plugin helps users to get utm data into contact forms hidden fields!
- * Version: 1.0
+ * Version: 0.2
  * Author: Move Ahead Media
  * Author URI: https://github.com/moveaheadmedia
  * Requires jQuery to be installed and ACF Pro plugin
@@ -15,105 +15,110 @@ global $mam_utm_to_forms_fields;
 $mam_utm_to_forms_fields = array();
 add_action( 'plugins_loaded', 'mam_utm_to_forms_store_values' );
 function mam_utm_to_forms_store_values() {
-	$original       = array();
+	$original = array();
 	if ( isset( $_COOKIE['mam_utm_to_forms_parameters'] ) ) {
 		$original = json_decode( $_COOKIE['mam_utm_to_forms_parameters'], true );
 	}
 	if ( isset( $_GET['utm_source'] ) && $_GET['utm_source'] != '' ) {
-			$original['utm_source'] = $_GET['utm_source'];
-	}else{
+		$original['utm_source'] = $_GET['utm_source'];
+	} else {
 		if ( ! isset( $original['utm_source'] ) || $original['utm_source'] == '' ) {
 			$original['utm_source'] = 'Direct';
 		}
 	}
 
 	if ( isset( $_GET['utm_medium'] ) && $_GET['utm_medium'] != '' ) {
-			$original['utm_medium'] = $_GET['utm_medium'];
-	}else{
+		$original['utm_medium'] = $_GET['utm_medium'];
+	} else {
 		if ( ! isset( $original['utm_medium'] ) || $original['utm_medium'] == '' ) {
 			$original['utm_medium'] = '';
 		}
 	}
 
 	if ( isset( $_GET['utm_campaign'] ) && $_GET['utm_campaign'] != '' ) {
-			$original['utm_campaign'] = $_GET['utm_campaign'];
-	}else{
+		$original['utm_campaign'] = $_GET['utm_campaign'];
+	} else {
 		if ( ! isset( $original['utm_campaign'] ) || $original['utm_campaign'] == '' ) {
 			$original['utm_campaign'] = '';
 		}
 	}
 
-	if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
-			$original['referral_url'] = $_SERVER['HTTP_REFERER'];
-	}else{
+	if ( isset( $_SERVER['HTTP_REFERER'] ) && strpos( $_SERVER['HTTP_REFERER'], site_url() ) === false ) {
+		$original['referral_url'] = $_SERVER['HTTP_REFERER'];
+	} else {
 		if ( ! isset( $original['referral_url'] ) || $original['referral_url'] == '' ) {
 			$original['referral_url'] = '';
 		}
 	}
 
-    $custom_mapping = mam_add_to_mam_utm_to_forms_custom_mapping_field();
-    foreach ($custom_mapping as $item){
-	    if ( isset( $_GET[$item['parameter']] ) ) {
-		    if ( ! isset( $original[$item['parameter']] ) || $original[$item['parameter']] == '' ) {
-			    $original[$item['parameter']] = $_GET[$item['parameter']];
-		    }
-	    }
-    }
+	$custom_mapping = mam_add_to_mam_utm_to_forms_custom_mapping_field();
+	foreach ( $custom_mapping as $item ) {
+		if ( isset( $_GET[ $item['parameter'] ] ) ) {
+			if ( ! isset( $original[ $item['parameter'] ] ) || $original[ $item['parameter'] ] == '' ) {
+				$original[ $item['parameter'] ] = $_GET[ $item['parameter'] ];
+			}
+		}
+	}
 
-	setcookie( 'mam_utm_to_forms_parameters', json_encode( $original ), time() + 36000, '/');
+	setcookie( 'mam_utm_to_forms_parameters', json_encode( $original ), time() + 36000, '/' );
 
 	mam_utm_to_forms_init_parameters();
 	global $mam_utm_to_forms_fields;
-	setcookie( 'mam_utm_to_forms_fields', json_encode( $mam_utm_to_forms_fields ), time() + 36000, '/');
+	setcookie( 'mam_utm_to_forms_fields', json_encode( $mam_utm_to_forms_fields ), time() + 36000, '/' );
 }
 
 function mam_utm_to_forms_init_parameters() {
-	$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+	$actual_link = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? "https" : "http" ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 
-	$original       = array();
+	$original = array();
 	if ( isset( $_COOKIE['mam_utm_to_forms_parameters'] ) ) {
 		$original = json_decode( $_COOKIE['mam_utm_to_forms_parameters'], true );
 	}
 
-	mam_add_to_mam_utm_to_forms_parameters(get_field('page', 'option'), urlencode($actual_link));
-	mam_add_to_mam_utm_to_forms_parameters(get_field('utm_source', 'option'), $original['utm_source']);
-	mam_add_to_mam_utm_to_forms_parameters(get_field('utm_medium', 'option'), $original['utm_medium']);
-	mam_add_to_mam_utm_to_forms_parameters(get_field('utm_campaign', 'option'), $original['utm_campaign']);
-	mam_add_to_mam_utm_to_forms_parameters(get_field('referral_url', 'option'), $original['referral_url']);
+	mam_add_to_mam_utm_to_forms_parameters( get_field( 'page', 'option' ), urlencode( $actual_link ) );
+	mam_add_to_mam_utm_to_forms_parameters( get_field( 'utm_source', 'option' ), $original['utm_source'] );
+	mam_add_to_mam_utm_to_forms_parameters( get_field( 'utm_medium', 'option' ), $original['utm_medium'] );
+	mam_add_to_mam_utm_to_forms_parameters( get_field( 'utm_campaign', 'option' ), $original['utm_campaign'] );
+	mam_add_to_mam_utm_to_forms_parameters( get_field( 'referral_url', 'option' ), $original['referral_url'] );
 
 	$custom_mapping = mam_add_to_mam_utm_to_forms_custom_mapping_field();
-	foreach ($custom_mapping as $item){
-		mam_add_to_mam_utm_to_forms_parameters($item['name'], $original[$item['parameter']]);
+	foreach ( $custom_mapping as $item ) {
+		mam_add_to_mam_utm_to_forms_parameters( $item['name'], $original[ $item['parameter'] ] );
 	}
 }
 
-function mam_add_to_mam_utm_to_forms_parameters($field, $value){
+function mam_add_to_mam_utm_to_forms_parameters( $field, $value ) {
 	global $mam_utm_to_forms_fields;
-	$item = array();
-	$item['field'] = $field;
-	$item['value'] =  $value;
+	$item                      = array();
+	$item['field']             = $field;
+	$item['value']             = $value;
 	$mam_utm_to_forms_fields[] = $item;
 }
 
 function mam_add_to_mam_utm_to_forms_custom_mapping_field(): array {
-    $result = array();
-	if( have_rows('custom_fields_mapping', 'option') ) {
-		while( have_rows('custom_fields_mapping', 'option') ) {
+	$result = array();
+	if ( have_rows( 'custom_fields_mapping', 'option' ) ) {
+		while ( have_rows( 'custom_fields_mapping', 'option' ) ) {
 			the_row();
-            $item = array();
-            $item['parameter'] = get_sub_field('parameter');
-            $item['name'] = get_sub_field('name');
-			$result[] = $item;
+			$item              = array();
+			$item['parameter'] = get_sub_field( 'parameter' );
+			$item['name']      = get_sub_field( 'name' );
+			$result[]          = $item;
 		}
 	}
-    return $result;
+
+	return $result;
 }
 
 // include script
 function mam_add_to_mam_utm_to_forms_scripts() {
-	wp_enqueue_script( 'js-cookies', 'https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js');
-	wp_enqueue_script( 'mam_add_to_mam_utm_to_forms', plugins_url( '/scripts.js' , __FILE__ ), array( 'jquery', 'js-cookies' ) );
+	wp_enqueue_script( 'js-cookies', 'https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js' );
+	wp_enqueue_script( 'mam_add_to_mam_utm_to_forms', plugins_url( '/scripts.js', __FILE__ ), array(
+		'jquery',
+		'js-cookies'
+	) );
 }
+
 add_action( 'wp_enqueue_scripts', 'mam_add_to_mam_utm_to_forms_scripts' );
 
 // Create the admin options page
