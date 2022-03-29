@@ -3,7 +3,7 @@
  * Plugin Name: Move Ahead Media UTM To Forms
  * Plugin URI: https://github.com/moveaheadmedia/mam-utm-to-forms/
  * Description: This plugin helps users to get utm data into contact forms hidden fields!
- * Version: 0.2
+ * Version: 1.1
  * Author: Move Ahead Media
  * Author URI: https://github.com/moveaheadmedia
  * Requires jQuery to be installed and ACF Pro plugin
@@ -43,7 +43,7 @@ function mam_utm_to_forms_store_values() {
 		}
 	}
 
-	if ( isset( $_SERVER['HTTP_REFERER'] ) && strpos( $_SERVER['HTTP_REFERER'], site_url() ) === false ) {
+	if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
 		$original['referral_url'] = $_SERVER['HTTP_REFERER'];
 	} else {
 		if ( ! isset( $original['referral_url'] ) || $original['referral_url'] == '' ) {
@@ -159,11 +159,9 @@ function mam_utm_to_forms_settings_link( $links ) {
 	) );
 	// Create the link.
 	$settings_link = "<a href='$url'>" . __( 'Settings' ) . '</a>';
+
 	// Adds the link to the end of the array.
-	array_push(
-		$links,
-		$settings_link
-	);
+	$links[] = $settings_link;
 
 	return $links;
 }
